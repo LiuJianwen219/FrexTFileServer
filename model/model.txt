@@ -1,5 +1,9 @@
 对于某一个测试题目
 
+/tcls/
+系统测试编译脚本文件存放路径：由系统进行post
+./sys/testing/main.tcl
+
 /questions/
 系统测试文件存放路径：由系统进行post
 ./sys/testing/{testId}/{topic}.zip
@@ -21,7 +25,8 @@
 ./user/{userId}/testing/{testId}/{submitId}/output/{topic}.result
 
 (完全临时，不涉及’文件系统‘，由编译web自己决定，甚至可以在/tmp下面)编译的临时目录：
-./tmp/{userId}/testing/{testId}/{submitId}/
+./user/{userId}/testing/{testId}/{submitId}/
+./sys/testing/{testId}/
 
 编译请求：
 1. 用户文件v：由编译web进行get

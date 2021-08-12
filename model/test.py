@@ -1,3 +1,6 @@
+import os
+import shutil
+
 import requests
 
 
@@ -143,8 +146,9 @@ def get_ping():
 
 
 if __name__ == "__main__":
-    print("test")
-    get_ping()
+    shutil.copyfile("model.txt", "ter2")
+    path = os.path.join("/tmp", "model.txt")
+    print(path)
     # get_help()
     # get_questions()
     # post_questions()

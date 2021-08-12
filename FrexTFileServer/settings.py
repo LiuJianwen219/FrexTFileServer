@@ -119,6 +119,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Exotic File Path
-userFilesPath = "../exoticTest/files/userFiles/"
 rootFileDir = "/data/FrexT"
 rootFileDirDebug = "F:\\0Web\\file_system"

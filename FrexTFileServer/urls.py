@@ -18,6 +18,7 @@ from FrexTFileServer import views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
+    url(r'tcls/$', views.tcls),
     url(r'questions/$', views.questions),
     url(r'tests/$', views.tests),
     url(r'bits/$', views.bits),

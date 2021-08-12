@@ -1,12 +1,28 @@
 import logging
 import os
+import socket
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from FrexTFileServer.settings import rootFileDir, DEBUG, rootFileDirDebug
 
-logger = logging.getLogger(__name__)
 rootPath = rootFileDir if DEBUG is False else rootFileDirDebug
+
+
+# get path
+# cur_dir = os.path.abspath(__file__).rsplit("/", 1)[0]
+log_path = os.path.join(rootPath, "FrexTFileServer_"+socket.gethostname()+".log")
+
+# encoding='utf-8'
+logging.basicConfig(filename=log_path, level=logging.DEBUG,
+                    filemode = 'w', format='%(levelname)s:%(asctime)s:%(message)s',
+                    datefmt='%Y-%d-%m %H:%M:%S')
+logging.debug('Welcome to use FrexT File System!')
+logging.info('This component a sub component of FrexT project.')
+logging.warning('Providing file operations,')
+logging.error('Current version is v1.0.0,')
+logging.critical("For helping, please see localhost:8010/help/")
+logger = logging.getLogger(__name__)
 
 
 # read file interface, maybe DFS future
@@ -27,6 +43,41 @@ def file_writer(fire_dir, file_name, file_content):
     with open(os.path.join(fire_dir, file_name), 'wb+') as destination:
         for chunk in file_content.chunks():
             destination.write(chunk)
+
+
+@csrf_exempt
+def tcls(request):
+    tclName = "main"
+    if request.method == "GET":
+        fileDir = os.path.join(rootPath, "sys", "testing")
+        fileName = tclName + ".tcl"
+        filePath = os.path.join(fileDir, fileName)
+        logger.info("Read Tcl: " + filePath)
+
+        file = file_reader(filePath)
+
+        response = HttpResponse(file)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = 'attachment;filename="{0}.tcl"'.format(tclName)
+        response["filePath"] = filePath
+        response["fileName"] = fileName
+        response["status"] = "success" if file is not None else "failed"
+        return response
+
+    elif request.method == "POST":
+        fileDir = os.path.join(rootPath, "sys", "testing")
+        fileName = tclName + ".tcl"
+        logger.info("Write Tcl: " + fileDir + fileName)
+
+        file_writer(fileDir, fileName, request.FILES["file"])
+
+        response = HttpResponse("tcl file save complete!")
+        response["status"] = "success"
+        return response
+
+    response = HttpResponse("unknown http action type for TCL.")
+    response["status"] = "failed"
+    return response
 
 
 @csrf_exempt
@@ -108,6 +159,7 @@ def tests(request):
     response["status"] = "failed"
     return response
 
+
 @csrf_exempt
 def bits(request):
     if request.method == "GET":
@@ -149,6 +201,7 @@ def bits(request):
     response["status"] = "failed"
     return response
 
+
 @csrf_exempt
 def logs(request):
     if request.method == "GET":
@@ -189,6 +242,7 @@ def logs(request):
     response = HttpResponse("unknown http action type for LOG.")
     response["status"] = "failed"
     return response
+
 
 @csrf_exempt
 def results(request):
@@ -235,8 +289,8 @@ def results(request):
 def help(request):
     if request.method == "GET":
         helpFileName = "help"
-        fileType = request.GET.get("type") if request.GET.get("type") is not None else "txt"
-        filePath = os.path.join(rootPath, helpFileName + "." + fileType)
+        fileType = request.GET.get("type") if request.GET.get("type") is not None else "md"
+        filePath = os.path.join(helpFileName + "." + fileType)
         logger.info("Read help: " + filePath)
 
         file = file_reader(filePath)
@@ -256,49 +310,3 @@ def help(request):
 
 def ping(request):
     return HttpResponse("pong")
-
-#
-# def download(request):
-#     userName = request.GET.get('userName')
-#     fid = request.GET.get('fid')
-#     count = request.GET.get('count')
-#     bitFileName = request.GET.get('bitFileName')
-#     deviceId = request.GET.get('deviceId')
-#     logger.warning(userName + " " + fid + " " + count + " " + bitFileName + " " + deviceId)
-#
-#     file = open(userFilesPath + userName + "/" + fid + "/" + count + "/" + bitFileName, 'rb')
-#     response = HttpResponse(file)
-#     response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
-#     response['Content-Disposition'] = 'attachment;filename="{0}.bit"'.format(deviceId)
-#     response["filePath"] = "asd"
-#     return response
-#
-#
-# def upload(request):
-#     userName = request.GET.get('userName')
-#     fid = request.GET.get('fid')
-#     count = request.GET.get('count')
-#     bitFileName = request.GET.get('bitFileName')
-#     deviceId = request.GET.get('deviceId')
-#     logger.warning(userName + " " + fid + " " + count + " " + bitFileName + " " + deviceId)
-#
-#     file = open(userFilesPath + userName + "/" + fid + "/" + count + "/" + bitFileName, 'rb')
-#     response = HttpResponse(file)
-#     response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
-#     response['Content-Disposition'] = 'attachment;filename="{0}.bit"'.format(deviceId)
-#     return response
-#
-#
-# def health(request):
-#     userName = request.GET.get('userName')
-#     fid = request.GET.get('fid')
-#     count = request.GET.get('count')
-#     bitFileName = request.GET.get('bitFileName')
-#     deviceId = request.GET.get('deviceId')
-#     logger.warning(userName + " " + fid + " " + count + " " + bitFileName + " " + deviceId)
-#
-#     file = open(userFilesPath + userName + "/" + fid + "/" + count + "/" + bitFileName, 'rb')
-#     response = HttpResponse(file)
-#     response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
-#     response['Content-Disposition'] = 'attachment;filename="{0}.bit"'.format(deviceId)
-#     return response

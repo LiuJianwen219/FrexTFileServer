@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/FrexTFileServer.iml" filepath="$PROJECT_DIR$/.idea/FrexTFileServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../FrexTCompiler/.idea/frexTcompiler.iml" filepath="$PROJECT_DIR$/../FrexTCompiler/.idea/frexTcompiler.iml" />
     </modules>
   </component>
 </project>
