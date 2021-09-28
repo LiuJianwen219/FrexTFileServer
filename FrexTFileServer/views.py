@@ -322,7 +322,7 @@ def experiment(request):
 
         fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
                                experimentType, experimentId)
-        logger.info("Write Result: " + fileDir + fileName)
+        logger.info("Write Experiment: " + fileDir + fileName)
 
         file_writer(fileDir, fileName, request.FILES["file"])
 
@@ -339,7 +339,7 @@ def experiment(request):
 
         fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
                                experimentType, experimentId)
-        logger.info("Delete Result: " + fileDir + fileName)
+        logger.info("Delete Experiment: " + fileDir + fileName)
 
         file_deleter(fileDir, fileName)
 
@@ -350,6 +350,71 @@ def experiment(request):
     response = HttpResponse("unknown http action type for EXPERIMENT.")
     response["status"] = "failed"
     return response
+
+
+@csrf_exempt
+def course(request):
+    if request.method == "GET":
+        userId = request.GET.get("userId", None)
+        courseId = request.GET.get("courseId", None)
+        courseTemplateId = request.GET.get("courseTemplateId", None)
+        courseTemplateExperimentId = request.GET.get("courseTemplateExperimentId", None)
+        fileName = request.GET.get("fileName", None)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "course",
+                               courseId, courseTemplateId, courseTemplateExperimentId)
+        filePath = os.path.join(fileDir, fileName)
+        logger.info("Read Course: " + filePath)
+
+        file = file_reader(filePath)
+
+        response = HttpResponse(file)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(fileName)
+        response["filePath"] = filePath
+        response["fileName"] = fileName
+        response["status"] = "success" if file is not None else "failed"
+        return response
+
+    elif request.method == "POST":
+        userId = request.POST.get("userId", None)
+        courseId = request.POST.get("courseId", None)
+        courseTemplateId = request.POST.get("courseTemplateId", None)
+        courseTemplateExperimentId = request.POST.get("courseTemplateExperimentId", None)
+        fileName = request.POST.get("fileName", None)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "course",
+                               courseId, courseTemplateId, courseTemplateExperimentId)
+        logger.info("Write Course: " + fileDir + fileName)
+
+        file_writer(fileDir, fileName, request.FILES["file"])
+
+        response = HttpResponse("course file save complete!")
+        response["status"] = "success"
+        return response
+
+    elif request.method == "DELETE":
+        delete = QueryDict(request.body)
+        userId = delete.get('userId')
+        courseId = delete.get('courseId')
+        courseTemplateId = delete.get('courseTemplateId')
+        courseTemplateExperimentId = delete.get('courseTemplateExperimentId')
+        fileName = delete.get('fileName')
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "course",
+                               courseId, courseTemplateId, courseTemplateExperimentId)
+        logger.info("Delete Course: " + fileDir + fileName)
+
+        file_deleter(fileDir, fileName)
+
+        response = HttpResponse("course file delete complete!")
+        response["status"] = "success"
+        return response
+
+    response = HttpResponse("unknown http action type for COURSE.")
+    response["status"] = "failed"
+    return response
+
 
 
 @csrf_exempt

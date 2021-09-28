@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'logs/$', views.logs),
     url(r'results/$', views.results),
     url(r'experiment/$', views.experiment),
+    url(r'course/$', views.course),
 
     url(r'help/$', views.help),
     url(r'ping/$', views.ping),
