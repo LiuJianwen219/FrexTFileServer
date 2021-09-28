@@ -13,4 +13,4 @@ COPY ./ /FrexT/FrexTFileServer/
 # expose port
 EXPOSE 8010/tcp
 
-ENTRYPOINT ["uwsgi", "--ini", "FrexTFileServer/FrexTFileServer.ini"]
+#ENTRYPOINT ["uwsgi", "--ini", "FrexTFileServer/FrexTFileServer.ini"]

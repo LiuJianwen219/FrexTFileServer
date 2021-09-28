@@ -1,21 +1,20 @@
 import logging
 import os
 import socket
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from django.views.decorators.csrf import csrf_exempt
 
 from FrexTFileServer.settings import rootFileDir, DEBUG, rootFileDirDebug
 
 rootPath = rootFileDir if DEBUG is False else rootFileDirDebug
 
-
 # get path
 # cur_dir = os.path.abspath(__file__).rsplit("/", 1)[0]
-log_path = os.path.join(rootPath, "FrexTFileServer_"+socket.gethostname()+".log")
+log_path = os.path.join(rootPath, "FrexTFileServer_" + socket.gethostname() + ".log")
 
 # encoding='utf-8'
 logging.basicConfig(filename=log_path, level=logging.DEBUG,
-                    filemode = 'w', format='%(levelname)s:%(asctime)s:%(message)s',
+                    filemode='w', format='%(levelname)s:%(asctime)s:%(message)s',
                     datefmt='%Y-%d-%m %H:%M:%S')
 logging.debug('Welcome to use FrexT File System!')
 logging.info('This component a sub component of FrexT project.')
@@ -43,6 +42,12 @@ def file_writer(fire_dir, file_name, file_content):
     with open(os.path.join(fire_dir, file_name), 'wb+') as destination:
         for chunk in file_content.chunks():
             destination.write(chunk)
+
+
+# delete file interface, maybe DFS future
+def file_deleter(fire_dir, file_name):
+    if os.path.exists(os.path.join(fire_dir, file_name)):
+        os.remove(os.path.join(fire_dir, file_name))
 
 
 @csrf_exempt
@@ -282,6 +287,213 @@ def results(request):
         return response
 
     response = HttpResponse("unknown http action type for RESULT.")
+    response["status"] = "failed"
+    return response
+
+
+@csrf_exempt
+def experiment(request):
+    if request.method == "GET":
+        userId = request.GET.get("userId", None)
+        experimentType = request.GET.get("experimentType", None)
+        experimentId = request.GET.get("experimentId", None)
+        fileName = request.GET.get("fileName", None)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId)
+        filePath = os.path.join(fileDir, fileName)
+        logger.info("Read Experiment: " + filePath)
+
+        file = file_reader(filePath)
+
+        response = HttpResponse(file)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(fileName)
+        response["filePath"] = filePath
+        response["fileName"] = fileName
+        response["status"] = "success" if file is not None else "failed"
+        return response
+
+    elif request.method == "POST":
+        userId = request.POST.get("userId", None)
+        experimentType = request.POST.get("experimentType", None)
+        experimentId = request.POST.get("experimentId", None)
+        fileName = request.POST.get("fileName", None)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId)
+        logger.info("Write Result: " + fileDir + fileName)
+
+        file_writer(fileDir, fileName, request.FILES["file"])
+
+        response = HttpResponse("experiment file save complete!")
+        response["status"] = "success"
+        return response
+
+    elif request.method == "DELETE":
+        delete = QueryDict(request.body)
+        userId = delete.get('userId')
+        experimentType = delete.get('experimentType')
+        experimentId = delete.get('experimentId')
+        fileName = delete.get('fileName')
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId)
+        logger.info("Delete Result: " + fileDir + fileName)
+
+        file_deleter(fileDir, fileName)
+
+        response = HttpResponse("experiment file delete complete!")
+        response["status"] = "success"
+        return response
+
+    response = HttpResponse("unknown http action type for EXPERIMENT.")
+    response["status"] = "failed"
+    return response
+
+
+@csrf_exempt
+def online_bits(request):
+    if request.method == "GET":
+        userId = request.GET.get("userId")
+        experimentType = request.GET.get("experimentType", None)
+        experimentId = request.GET.get("experimentId", None)
+        compileId = request.GET.get("compileId", None)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId, "output")
+        fileName = compileId + ".bit"
+        filePath = os.path.join(fileDir, fileName)
+        logger.info("Read Bit: " + filePath)
+
+        file = file_reader(filePath)
+
+        response = HttpResponse(file)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = 'attachment;filename="{0}.bit"'.format(compileId)
+        response["filePath"] = filePath
+        response["fileName"] = fileName
+        response["status"] = "success" if file is not None else "failed"
+        return response
+
+    elif request.method == "POST":
+        userId = request.POST.get("userId")
+        experimentType = request.POST.get("experimentType", None)
+        experimentId = request.POST.get("experimentId", None)
+        compileId = request.POST.get("compileId", None)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId, "output")
+        fileName = compileId + ".bit"
+        logger.info("Write Bit: " + fileDir + fileName)
+
+        file_writer(fileDir, fileName, request.FILES["file"])
+
+        response = HttpResponse("bit file save complete!")
+        response["status"] = "success"
+        return response
+
+    response = HttpResponse("unknown http action type for BIT.")
+    response["status"] = "failed"
+    return response
+
+
+@csrf_exempt
+def own_bits(request):
+    if request.method == "GET":
+        userId = request.GET.get("userId")
+        experimentType = request.GET.get("experimentType", None)
+        experimentId = request.GET.get("experimentId", None)
+        fileName = request.GET.get("fileName", None)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId)
+        filePath = os.path.join(fileDir, fileName)
+        logger.info("Read Bit: " + filePath)
+
+        file = file_reader(filePath)
+
+        response = HttpResponse(file)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(fileName)
+        response["filePath"] = filePath
+        response["fileName"] = fileName
+        response["status"] = "success" if file is not None else "failed"
+        return response
+
+    elif request.method == "POST":
+        userId = request.POST.get("userId")
+        experimentType = request.POST.get("experimentType", None)
+        experimentId = request.POST.get("experimentId", None)
+        fileName = request.POST.get("fileName", None)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId)
+        logger.info("Write Bit: " + fileDir + fileName)
+
+        file_writer(fileDir, fileName, request.FILES["file"])
+
+        response = HttpResponse("bit file save complete!")
+        response["status"] = "success"
+        return response
+
+    response = HttpResponse("unknown http action type for BIT.")
+    response["status"] = "failed"
+    return response
+
+
+@csrf_exempt
+def online_logs(request):
+    if request.method == "GET":
+        userId = request.GET.get("userId")
+        experimentType = request.GET.get("experimentType", None)
+        experimentId = request.GET.get("experimentId", None)
+        compileId = request.GET.get("compileId", None)
+
+        print(userId)
+        print(experimentType)
+        print(experimentId)
+        print(compileId)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId, "output")
+        fileName = compileId + ".log"
+        filePath = os.path.join(fileDir, fileName)
+        logger.info("Read Log: " + filePath)
+
+        file = file_reader(filePath)
+
+        response = HttpResponse(file)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = 'attachment;filename="{0}.log"'.format(compileId)
+        response["filePath"] = filePath
+        response["fileName"] = fileName
+        response["status"] = "success" if file is not None else "failed"
+        return response
+
+    elif request.method == "POST":
+        userId = request.POST.get("userId")
+        experimentType = request.POST.get("experimentType", None)
+        experimentId = request.POST.get("experimentId", None)
+        compileId = request.POST.get("compileId", None)
+
+        print(userId)
+        print(experimentType)
+        print(experimentId)
+        print(compileId)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId, "output")
+        fileName = compileId + ".log"
+        logger.info("Write Log: " + fileDir + fileName)
+
+        file_writer(fileDir, fileName, request.FILES["file"])
+
+        response = HttpResponse("log file save complete!")
+        response["status"] = "success"
+        return response
+
+    response = HttpResponse("unknown http action type for LOG.")
     response["status"] = "failed"
     return response
 

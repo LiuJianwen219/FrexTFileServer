@@ -25,7 +25,6 @@ spec:
     - protocol: TCP
       port: 8010
       targetPort: 8010
-      nodePort: 30010
 
 ---
 
@@ -47,17 +46,25 @@ spec:
     spec:
       containers:
       - name: frext-file
-        image: wxwd14388/frext-file:v1.1.1
+        image: wxwd14388/frext-file:v0.1.1
         imagePullPolicy: IfNotPresent
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do echo hello; sleep 4;done"]
         ports:
         - containerPort: 8010
         volumeMounts:
           - name: fs
             mountPath: /data/FrexT
+          - name: code
+            mountPath: /code
       volumes:
         - name: fs
           hostPath:
-            path: /root/FrexT_data/frext-file-system
+            path: /root/frext-file-system
+            type: Directory
+        - name: code
+          hostPath:
+            path: /mnt/hgfs/0Web
             type: Directory
       affinity:
         nodeAffinity:

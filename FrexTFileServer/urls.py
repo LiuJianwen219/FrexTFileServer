@@ -21,9 +21,16 @@ urlpatterns = [
     url(r'tcls/$', views.tcls),
     url(r'questions/$', views.questions),
     url(r'tests/$', views.tests),
+
+    url(r'own_bits/$', views.own_bits), # 必须放在前面？？？？
+
+    url(r'online_bits/$', views.online_bits), # 必须放在前面？？？？
+    url(r'online_logs/$', views.online_logs), # 不然会先匹配logs？？？？
+
     url(r'bits/$', views.bits),
     url(r'logs/$', views.logs),
     url(r'results/$', views.results),
+    url(r'experiment/$', views.experiment),
 
     url(r'help/$', views.help),
     url(r'ping/$', views.ping),
