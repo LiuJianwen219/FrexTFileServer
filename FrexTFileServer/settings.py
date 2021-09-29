@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'f0$%7ex*+#8&3j#i+a*3j_9j6t#=zlv#9^iziumtprt3s_=hoo'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -120,4 +120,4 @@ STATIC_URL = '/static/'
 
 # Exotic File Path
 rootFileDir = "/data/FrexT"
-rootFileDirDebug = "F:\\0Web\\file_system"
+rootFileDirDebug = "/data/FrexT"
