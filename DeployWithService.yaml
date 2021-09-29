@@ -25,7 +25,6 @@ spec:
     - protocol: TCP
       port: 8010
       targetPort: 8010
-      nodePort: 30010
 
 ---
 
