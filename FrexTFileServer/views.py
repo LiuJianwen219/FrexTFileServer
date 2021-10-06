@@ -35,6 +35,16 @@ def file_reader(file_path):
     return None
 
 
+def file_reader_utf8(file_path):
+    if os.path.exists(file_path):
+        file = open(file_path, 'r', encoding="utf-8")
+        file_content = file.read()
+        file.close()
+        return file_content
+    logger.error("Read Question error: file not found: " + file_path)
+    return None
+
+
 # write file interface, maybe DFS future
 def file_writer(fire_dir, file_name, file_content):
     if not os.path.exists(fire_dir):
@@ -526,7 +536,7 @@ def online_logs(request):
         filePath = os.path.join(fileDir, fileName)
         logger.info("Read Log: " + filePath)
 
-        file = file_reader(filePath)
+        file = file_reader_utf8(filePath)
 
         response = HttpResponse(file)
         response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
