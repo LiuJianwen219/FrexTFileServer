@@ -25,7 +25,6 @@ spec:
     - protocol: TCP
       port: 8010
       targetPort: 8010
-      nodePort: 30010
 
 ---
 
@@ -54,10 +53,16 @@ spec:
         volumeMounts:
           - name: fs
             mountPath: /data/FrexT
+          - name: ffff
+            mountPath: /tmp/FrexT
       volumes:
         - name: fs
           hostPath:
             path: /root/FrexT_data/frext-file-system
+            type: Directory
+        - name: ffff
+          hostPath:
+            path: /root/FrexT
             type: Directory
       affinity:
         nodeAffinity:
