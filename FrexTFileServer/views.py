@@ -260,7 +260,7 @@ def rpts(request):
 
 
 @csrf_exempt
-def zips(request):
+def projects(request):
     if request.method == "GET":
         userId = request.GET.get("userId")
         testId = request.GET.get("testId")
@@ -510,7 +510,6 @@ def course(request):
     return response
 
 
-
 @csrf_exempt
 def online_bits(request):
     if request.method == "GET":
@@ -558,23 +557,24 @@ def online_bits(request):
 
 
 @csrf_exempt
-def own_bits(request):
+def online_rpts(request):
     if request.method == "GET":
         userId = request.GET.get("userId")
         experimentType = request.GET.get("experimentType", None)
         experimentId = request.GET.get("experimentId", None)
-        fileName = request.GET.get("fileName", None)
+        compileId = request.GET.get("compileId", None)
 
         fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
-                               experimentType, experimentId)
+                               experimentType, experimentId, "output")
+        fileName = compileId + ".rpt"
         filePath = os.path.join(fileDir, fileName)
-        logger.info("Read Bit: " + filePath)
+        logger.info("Read Rpt: " + filePath)
 
         file = file_reader(filePath)
 
         response = HttpResponse(file)
         response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
-        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(fileName)
+        response['Content-Disposition'] = 'attachment;filename="{0}.rpt"'.format(compileId)
         response["filePath"] = filePath
         response["fileName"] = fileName
         response["status"] = "success" if file is not None else "failed"
@@ -584,19 +584,66 @@ def own_bits(request):
         userId = request.POST.get("userId")
         experimentType = request.POST.get("experimentType", None)
         experimentId = request.POST.get("experimentId", None)
-        fileName = request.POST.get("fileName", None)
+        compileId = request.POST.get("compileId", None)
 
         fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
-                               experimentType, experimentId)
-        logger.info("Write Bit: " + os.path.join(fileDir, fileName))
+                               experimentType, experimentId, "output")
+        fileName = compileId + ".rpt"
+        logger.info("Write Rpt: " + os.path.join(fileDir, fileName))
 
         file_writer(fileDir, fileName, request.FILES["file"])
 
-        response = HttpResponse("bit file save complete!")
+        response = HttpResponse("rpt file save complete!")
         response["status"] = "success"
         return response
 
-    response = HttpResponse("unknown http action type for BIT.")
+    response = HttpResponse("unknown http action type for RPT.")
+    response["status"] = "failed"
+    return response
+
+
+@csrf_exempt
+def online_projects(request):
+    if request.method == "GET":
+        userId = request.GET.get("userId")
+        experimentType = request.GET.get("experimentType", None)
+        experimentId = request.GET.get("experimentId", None)
+        compileId = request.GET.get("compileId", None)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId, "output")
+        fileName = compileId + ".zip"
+        filePath = os.path.join(fileDir, fileName)
+        logger.info("Read Project: " + filePath)
+
+        file = file_reader(filePath)
+
+        response = HttpResponse(file)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = 'attachment;filename="{0}.zip"'.format(compileId)
+        response["filePath"] = filePath
+        response["fileName"] = fileName
+        response["status"] = "success" if file is not None else "failed"
+        return response
+
+    elif request.method == "POST":
+        userId = request.POST.get("userId")
+        experimentType = request.POST.get("experimentType", None)
+        experimentId = request.POST.get("experimentId", None)
+        compileId = request.POST.get("compileId", None)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId, "output")
+        fileName = compileId + ".zip"
+        logger.info("Write Project: " + os.path.join(fileDir, fileName))
+
+        file_writer(fileDir, fileName, request.FILES["file"])
+
+        response = HttpResponse("project file save complete!")
+        response["status"] = "success"
+        return response
+
+    response = HttpResponse("unknown http action type for PROJECT.")
     response["status"] = "failed"
     return response
 
@@ -653,6 +700,50 @@ def online_logs(request):
         return response
 
     response = HttpResponse("unknown http action type for LOG.")
+    response["status"] = "failed"
+    return response
+
+
+@csrf_exempt
+def own_bits(request):
+    if request.method == "GET":
+        userId = request.GET.get("userId")
+        experimentType = request.GET.get("experimentType", None)
+        experimentId = request.GET.get("experimentId", None)
+        fileName = request.GET.get("fileName", None)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId)
+        filePath = os.path.join(fileDir, fileName)
+        logger.info("Read Bit: " + filePath)
+
+        file = file_reader(filePath)
+
+        response = HttpResponse(file)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(fileName)
+        response["filePath"] = filePath
+        response["fileName"] = fileName
+        response["status"] = "success" if file is not None else "failed"
+        return response
+
+    elif request.method == "POST":
+        userId = request.POST.get("userId")
+        experimentType = request.POST.get("experimentType", None)
+        experimentId = request.POST.get("experimentId", None)
+        fileName = request.POST.get("fileName", None)
+
+        fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
+                               experimentType, experimentId)
+        logger.info("Write Bit: " + os.path.join(fileDir, fileName))
+
+        file_writer(fileDir, fileName, request.FILES["file"])
+
+        response = HttpResponse("bit file save complete!")
+        response["status"] = "success"
+        return response
+
+    response = HttpResponse("unknown http action type for BIT.")
     response["status"] = "failed"
     return response
 

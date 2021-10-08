@@ -22,14 +22,16 @@ urlpatterns = [
     url(r'questions/$', views.questions),
     url(r'tests/$', views.tests),
 
-    url(r'own_bits/$', views.own_bits), # 必须放在前面？？？？
+    url(r'own_bits/$', views.own_bits),  # 必须放在前面？？？？
 
-    url(r'online_bits/$', views.online_bits), # 必须放在前面？？？？
-    url(r'online_logs/$', views.online_logs), # 不然会先匹配logs？？？？
+    url(r'online_bits/$', views.online_bits),  # 必须放在前面？？？？
+    url(r'online_rpts/$', views.online_rpts),
+    url(r'online_projects/$', views.online_projects),
+    url(r'online_logs/$', views.online_logs),  # 不然会先匹配logs？？？？
 
     url(r'bits/$', views.bits),
     url(r'rpts/$', views.rpts),
-    url(r'zips/$', views.zips),
+    url(r'projects/$', views.projects),
     url(r'logs/$', views.logs),
     url(r'results/$', views.results),
     url(r'experiment/$', views.experiment),
