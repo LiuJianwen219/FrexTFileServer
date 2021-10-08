@@ -82,7 +82,7 @@ def tcls(request):
     elif request.method == "POST":
         fileDir = os.path.join(rootPath, "sys", "testing")
         fileName = tclName + ".tcl"
-        logger.info("Write Tcl: " + fileDir + fileName)
+        logger.info("Write Tcl: " + os.path.join(fileDir, fileName))
 
         file_writer(fileDir, fileName, request.FILES["file"])
 
@@ -120,7 +120,7 @@ def questions(request):
         topic = request.POST.get("topic")
         fileDir = os.path.join(rootPath, "sys", "testing", testId)
         fileName = topic + ".zip"
-        logger.info("Write Question: " + fileDir + fileName)
+        logger.info("Write Question: " + os.path.join(fileDir, fileName))
 
         file_writer(fileDir, fileName, request.FILES["file"])
 
@@ -162,7 +162,7 @@ def tests(request):
         topic = request.POST.get("topic")
         fileDir = os.path.join(rootPath, "user", userId, "testing", testId, submitId)
         fileName = topic + ".v"
-        logger.info("Write Test: " + fileDir + fileName)
+        logger.info("Write Test: " + os.path.join(fileDir, fileName))
 
         file_writer(fileDir, fileName, request.FILES["file"])
 
@@ -204,7 +204,7 @@ def bits(request):
         topic = request.POST.get("topic")
         fileDir = os.path.join(rootPath, "user", userId, "testing", testId, submitId, "output")
         fileName = topic + ".bit"
-        logger.info("Write Bit: " + fileDir + fileName)
+        logger.info("Write Bit: " + os.path.join(fileDir, fileName))
 
         file_writer(fileDir, fileName, request.FILES["file"])
 
@@ -213,6 +213,90 @@ def bits(request):
         return response
 
     response = HttpResponse("unknown http action type for BIT.")
+    response["status"] = "failed"
+    return response
+
+
+@csrf_exempt
+def rpts(request):
+    if request.method == "GET":
+        userId = request.GET.get("userId")
+        testId = request.GET.get("testId")
+        submitId = request.GET.get("submitId")
+        topic = request.GET.get("topic")
+        fileDir = os.path.join(rootPath, "user", userId, "testing", testId, submitId, "output")
+        fileName = topic + ".rpt"
+        filePath = os.path.join(fileDir, fileName)
+        logger.info("Read Rpt: " + filePath)
+
+        file = file_reader(filePath)
+
+        response = HttpResponse(file)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = 'attachment;filename="{0}.rpi"'.format(topic)
+        response["filePath"] = filePath
+        response["fileName"] = fileName
+        response["status"] = "success" if file is not None else "failed"
+        return response
+
+    elif request.method == "POST":
+        userId = request.POST.get("userId")
+        testId = request.POST.get("testId")
+        submitId = request.POST.get("submitId")
+        topic = request.POST.get("topic")
+        fileDir = os.path.join(rootPath, "user", userId, "testing", testId, submitId, "output")
+        fileName = topic + ".rpt"
+        logger.info("Write Rpt: " + os.path.join(fileDir, fileName))
+
+        file_writer(fileDir, fileName, request.FILES["file"])
+
+        response = HttpResponse("rpt file save complete!")
+        response["status"] = "success"
+        return response
+
+    response = HttpResponse("unknown http action type for RPT.")
+    response["status"] = "failed"
+    return response
+
+
+@csrf_exempt
+def zips(request):
+    if request.method == "GET":
+        userId = request.GET.get("userId")
+        testId = request.GET.get("testId")
+        submitId = request.GET.get("submitId")
+        topic = request.GET.get("topic")
+        fileDir = os.path.join(rootPath, "user", userId, "testing", testId, submitId, "output")
+        fileName = topic + ".zip"
+        filePath = os.path.join(fileDir, fileName)
+        logger.info("Read Zip: " + filePath)
+
+        file = file_reader(filePath)
+
+        response = HttpResponse(file)
+        response['Content-Type'] = 'application/octet-stream'  # 设置头信息，告诉浏览器这是个文件
+        response['Content-Disposition'] = 'attachment;filename="{0}.zip"'.format(topic)
+        response["filePath"] = filePath
+        response["fileName"] = fileName
+        response["status"] = "success" if file is not None else "failed"
+        return response
+
+    elif request.method == "POST":
+        userId = request.POST.get("userId")
+        testId = request.POST.get("testId")
+        submitId = request.POST.get("submitId")
+        topic = request.POST.get("topic")
+        fileDir = os.path.join(rootPath, "user", userId, "testing", testId, submitId, "output")
+        fileName = topic + ".zip"
+        logger.info("Write Zip: " + os.path.join(fileDir, fileName))
+
+        file_writer(fileDir, fileName, request.FILES["file"])
+
+        response = HttpResponse("zip file save complete!")
+        response["status"] = "success"
+        return response
+
+    response = HttpResponse("unknown http action type for ZIP.")
     response["status"] = "failed"
     return response
 
@@ -246,7 +330,7 @@ def logs(request):
         topic = request.POST.get("topic")
         fileDir = os.path.join(rootPath, "user", userId, "testing", testId, submitId, "output")
         fileName = topic + ".log"
-        logger.info("Write Log: " + fileDir + fileName)
+        logger.info("Write Log: " + os.path.join(fileDir, fileName))
 
         file_writer(fileDir, fileName, request.FILES["file"])
 
@@ -288,7 +372,7 @@ def results(request):
         topic = request.POST.get("topic")
         fileDir = os.path.join(rootPath, "user", userId, "testing", testId, submitId, "output")
         fileName = topic + ".result"
-        logger.info("Write Result: " + fileDir + fileName)
+        logger.info("Write Result: " + os.path.join(fileDir, fileName))
 
         file_writer(fileDir, fileName, request.FILES["file"])
 
@@ -332,7 +416,7 @@ def experiment(request):
 
         fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
                                experimentType, experimentId)
-        logger.info("Write Experiment: " + fileDir + fileName)
+        logger.info("Write Experiment: " + os.path.join(fileDir, fileName))
 
         file_writer(fileDir, fileName, request.FILES["file"])
 
@@ -349,7 +433,7 @@ def experiment(request):
 
         fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
                                experimentType, experimentId)
-        logger.info("Delete Experiment: " + fileDir + fileName)
+        logger.info("Delete Experiment: " + os.path.join(fileDir, fileName))
 
         file_deleter(fileDir, fileName)
 
@@ -395,7 +479,7 @@ def course(request):
 
         fileDir = os.path.join(rootPath, "user", userId, "online", "course",
                                courseId, courseTemplateId, courseTemplateExperimentId)
-        logger.info("Write Course: " + fileDir + fileName)
+        logger.info("Write Course: " + os.path.join(fileDir, fileName))
 
         file_writer(fileDir, fileName, request.FILES["file"])
 
@@ -413,7 +497,7 @@ def course(request):
 
         fileDir = os.path.join(rootPath, "user", userId, "online", "course",
                                courseId, courseTemplateId, courseTemplateExperimentId)
-        logger.info("Delete Course: " + fileDir + fileName)
+        logger.info("Delete Course: " + os.path.join(fileDir, fileName))
 
         file_deleter(fileDir, fileName)
 
@@ -460,7 +544,7 @@ def online_bits(request):
         fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
                                experimentType, experimentId, "output")
         fileName = compileId + ".bit"
-        logger.info("Write Bit: " + fileDir + fileName)
+        logger.info("Write Bit: " + os.path.join(fileDir, fileName))
 
         file_writer(fileDir, fileName, request.FILES["file"])
 
@@ -504,7 +588,7 @@ def own_bits(request):
 
         fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
                                experimentType, experimentId)
-        logger.info("Write Bit: " + fileDir + fileName)
+        logger.info("Write Bit: " + os.path.join(fileDir, fileName))
 
         file_writer(fileDir, fileName, request.FILES["file"])
 
@@ -560,7 +644,7 @@ def online_logs(request):
         fileDir = os.path.join(rootPath, "user", userId, "online", "experiment",
                                experimentType, experimentId, "output")
         fileName = compileId + ".log"
-        logger.info("Write Log: " + fileDir + fileName)
+        logger.info("Write Log: " + os.path.join(fileDir, fileName))
 
         file_writer(fileDir, fileName, request.FILES["file"])
 

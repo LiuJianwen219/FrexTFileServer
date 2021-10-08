@@ -28,6 +28,8 @@ urlpatterns = [
     url(r'online_logs/$', views.online_logs), # 不然会先匹配logs？？？？
 
     url(r'bits/$', views.bits),
+    url(r'rpts/$', views.rpts),
+    url(r'zips/$', views.zips),
     url(r'logs/$', views.logs),
     url(r'results/$', views.results),
     url(r'experiment/$', views.experiment),
