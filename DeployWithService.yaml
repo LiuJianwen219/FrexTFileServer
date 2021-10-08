@@ -46,7 +46,7 @@ spec:
     spec:
       containers:
       - name: frext-file
-        image: wxwd14388/frext-file:v1.2.4
+        image: wxwd14388/frext-file:v1.2.5
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8010
