@@ -31,7 +31,7 @@ def file_reader(file_path):
         file_content = file.read()
         file.close()
         return file_content
-    logger.error("Read Question error: file not found: " + file_path)
+    logger.error("Read File error: file not found: " + file_path)
     return None
 
 
@@ -41,7 +41,7 @@ def file_reader_utf8(file_path):
         file_content = file.read()
         file.close()
         return file_content
-    logger.error("Read Question error: file not found: " + file_path)
+    logger.error("Read File error: file not found: " + file_path)
     return None
 
 
