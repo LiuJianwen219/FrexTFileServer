@@ -64,6 +64,7 @@ def file_deleter(fire_dir, file_name):
 def tcls(request):
     tclName = "main"
     if request.method == "GET":
+        tclName = request.GET.get("tclName", "main")
         fileDir = os.path.join(rootPath, "sys", "testing")
         fileName = tclName + ".tcl"
         filePath = os.path.join(fileDir, fileName)
